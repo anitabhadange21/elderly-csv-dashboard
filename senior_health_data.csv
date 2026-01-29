@@ -1,0 +1,6 @@
+Senior_ID,Name,Age,Gender,BP_Systolic,BP_Diastolic,Heart_Rate,Diabetes,Hypertension,Mobility_Status,Medication_Count,Assistance_Required
+1,Sita,68,Female,130,85,76,No,Yes,Independent,2,Yes
+2,Lata,65,Female,120,80,70,No,No,Independent,1,No
+3,Sunita,67,Female,112,72,68,No,No,Independent,0,No
+...
+55,Deepak,79,Male,126,77,72,No,No,Independent,0,No
