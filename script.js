@@ -4,58 +4,78 @@ fetch("senior_health_data.csv")
   .then(res => res.text())
   .then(data => {
     const rows = data.split("\n").slice(1);
-
-    let low = 0, high = 0;
+    const select = document.getElementById("personSelect");
 
     rows.forEach(r => {
       const c = r.split(",");
       if (c.length < 12) return;
 
-      const person = {
+      seniors.push({
         name: c[1],
-        age: c[2],
-        bpSys: +c[4],
-        bpDia: +c[5],
+        age: +c[2],
+        gender: c[3],
+        sys: +c[4],
+        dia: +c[5],
         hr: +c[6],
         diabetes: c[7],
         hyper: c[8]
-      };
+      });
 
-      person.risk = "Low";
-
-      if (person.bpSys >= 160 || person.hr >= 100 || person.diabetes === "Yes") {
-        person.risk = "High"; high++;
-      } else {
-        low++;
-      }
-
-      seniors.push(person);
-
-      document.getElementById("personSelect").innerHTML +=
-        `<option value="${person.name}">${person.name}</option>`;
+      select.innerHTML += `<option value="${c[1]}">${c[1]}</option>`;
     });
 
-    document.getElementById("total").innerText = seniors.length;
-    document.getElementById("low").innerText = low;
-    document.getElementById("high").innerText = high;
+    document.getElementById("totalCount").innerText = seniors.length;
   });
 
 document.getElementById("personSelect").addEventListener("change", e => {
   const p = seniors.find(s => s.name === e.target.value);
   if (!p) return;
 
-  let advice = "Maintain healthy lifestyle";
+  let risk = "Low";
+  if (p.sys >= 160 || p.hr >= 100 || p.diabetes === "Yes") risk = "High";
+  else if (p.sys >= 140 || p.hr >= 85 || p.hyper === "Yes") risk = "Medium";
 
-  if (p.risk === "High") {
-    advice = "Consult doctor, monitor BP & sugar regularly";
-  }
-
-  document.getElementById("profile").innerHTML = `
-    <h2>${p.name}</h2>
-    <p>Age: ${p.age}</p>
-    <p>Blood Pressure: ${p.bpSys}/${p.bpDia}</p>
-    <p>Heart Rate: ${p.hr}</p>
-    <p>Risk Level: <span class="${p.risk.toLowerCase()}">${p.risk}</span></p>
-    <p><b>Recommendation:</b> ${advice}</p>
+  document.getElementById("personDetails").innerHTML = `
+    <table>
+      <tr><th>Age</th><th>Gender</th><th>BP</th><th>Heart Rate</th><th>Diabetes</th><th>Hypertension</th><th>Risk</th></tr>
+      <tr>
+        <td>${p.age}</td>
+        <td>${p.gender}</td>
+        <td>${p.sys}/${p.dia}</td>
+        <td>${p.hr}</td>
+        <td>${p.diabetes}</td>
+        <td>${p.hyper}</td>
+        <td class="${risk.toLowerCase()}">${risk}</td>
+      </tr>
+    </table>
   `;
+
+  let message = `
+    <p>🌟 <b>Positive Note:</b> Regular monitoring helps maintain independence and quality of life.</p>
+    <p><b>Focus Areas:</b> `;
+
+  if (risk === "High")
+    message += "Blood pressure, heart rate, and chronic condition management need attention.</p><p>💡 <b>Improvement:</b> Regular doctor visits, low-salt diet, daily walking, and medication adherence can greatly improve health and confidence.</p>";
+  else if (risk === "Medium")
+    message += "Blood pressure and lifestyle balance should be monitored.</p><p>💡 <b>Improvement:</b> Light exercise, stress reduction, and routine checkups are recommended.</p>";
+  else
+    message += "Current health indicators are stable.</p><p>💡 <b>Improvement:</b> Continue healthy habits and routine monitoring.</p>";
+
+  document.getElementById("healthSummary").innerHTML = message;
+
+  new Chart(document.getElementById("bpChart"), {
+    type: "bar",
+    data: {
+      labels: ["Systolic BP", "Diastolic BP"],
+      datasets: [{ data: [p.sys, p.dia] }]
+    }
+  });
+
+  new Chart(document.getElementById("hrChart"), {
+    type: "line",
+    data: {
+      labels: ["Heart Rate"],
+      datasets: [{ data: [p.hr] }]
+    }
+  });
 });
