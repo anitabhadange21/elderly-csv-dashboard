@@ -1,58 +1,105 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Senior Health Dashboard</title>
+  <title>Senior Citizen Health Monitoring Dashboard</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
   <style>
-    body { font-family: Arial; background:#f4f6f8; padding:20px; }
-    h1 { text-align:center; }
+    body { font-family: Arial; background:#f4f7fb; padding:20px; }
+    h1 { text-align:center; color:#023e8a; }
 
-    .cards { display:flex; gap:20px; justify-content:center; }
-    .card {
-      background:white; padding:15px; border-radius:8px;
-      width:200px; text-align:center;
-      box-shadow:0 2px 6px rgba(0,0,0,0.1);
+    .top {
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      margin-bottom:20px;
     }
 
-    select { padding:8px; font-size:16px; }
+    .count {
+      font-size:18px;
+      font-weight:bold;
+    }
 
-    .profile {
-      margin-top:20px;
+    select {
+      padding:8px;
+      font-size:16px;
+      width:250px;
+    }
+
+    table {
+      width:100%;
+      border-collapse:collapse;
+      margin-top:15px;
+      background:white;
+    }
+
+    th, td {
+      border:1px solid #ccc;
+      padding:10px;
+      text-align:center;
+    }
+
+    th {
+      background:#0077b6;
+      color:white;
+    }
+
+    .section {
       background:white;
       padding:20px;
+      margin-top:25px;
       border-radius:8px;
     }
 
     .low { color:green; font-weight:bold; }
     .medium { color:orange; font-weight:bold; }
     .high { color:red; font-weight:bold; }
+
+    .summary {
+      font-size:16px;
+      line-height:1.6;
+    }
+
+    canvas {
+      max-width:600px;
+      margin:30px auto;
+      display:block;
+    }
   </style>
 </head>
 
 <body>
 
-<h1>🧓 Senior Health Monitoring Dashboard</h1>
+<h1>🧓 Senior Citizen Health Monitoring Dashboard</h1>
 
-<!-- SUMMARY -->
-<div class="cards">
-  <div class="card"><h3>Total Seniors</h3><p id="total"></p></div>
-  <div class="card"><h3>Low Risk</h3><p id="low"></p></div>
-  <div class="card"><h3>High Risk</h3><p id="high"></p></div>
+<div class="top">
+  <div class="count">Total Seniors: <span id="totalCount">0</span></div>
+
+  <div>
+    <label><b>Select Senior:</b></label><br>
+    <select id="personSelect">
+      <option value="">Type or Select Name</option>
+    </select>
+  </div>
 </div>
 
-<br><br>
+<!-- Individual Data -->
+<div class="section">
+  <h2>👤 Individual Health Details</h2>
+  <div id="personDetails">Please select a senior to view details.</div>
+</div>
 
-<!-- PERSON SELECT -->
-<h2>🔍 Select Senior</h2>
-<select id="personSelect">
-  <option value="">-- Select Name --</option>
-</select>
+<!-- Summary -->
+<div class="section">
+  <h2>🧠 Health Summary & Recommendations</h2>
+  <div id="healthSummary" class="summary"></div>
+</div>
 
-<!-- INDIVIDUAL DETAILS -->
-<div class="profile" id="profile">
-  <h2>Individual Health Details</h2>
-  <p>Select a senior to view details</p>
+<!-- Charts -->
+<div class="section" style="text-align:center">
+  <h2>📊 Feature-wise Health Analysis</h2>
+  <canvas id="bpChart"></canvas>
+  <canvas id="hrChart"></canvas>
 </div>
 
 <script src="script.js"></script>
