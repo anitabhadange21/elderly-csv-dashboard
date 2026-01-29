@@ -1,55 +1,61 @@
+let seniors = [];
+
 fetch("senior_health_data.csv")
   .then(res => res.text())
   .then(data => {
     const rows = data.split("\n").slice(1);
-    const table = document.getElementById("healthTable");
 
-    let low = 0, medium = 0, high = 0;
+    let low = 0, high = 0;
 
-    rows.forEach(row => {
-      const c = row.split(",");
+    rows.forEach(r => {
+      const c = r.split(",");
       if (c.length < 12) return;
 
-      const name = c[1];
-      const age = +c[2];
-      const gender = c[3];
-      const sys = +c[4];
-      const dia = +c[5];
-      const hr = +c[6];
-      const diabetes = c[7];
-      const hyper = c[8];
+      const person = {
+        name: c[1],
+        age: c[2],
+        bpSys: +c[4],
+        bpDia: +c[5],
+        hr: +c[6],
+        diabetes: c[7],
+        hyper: c[8]
+      };
 
-      let risk = "Low";
+      person.risk = "Low";
 
-      if (sys >= 160 || dia >= 100 || hr >= 100 || diabetes === "Yes") {
-        risk = "High"; high++;
-      } else if (sys >= 140 || dia >= 90 || hr >= 85 || hyper === "Yes") {
-        risk = "Medium"; medium++;
+      if (person.bpSys >= 160 || person.hr >= 100 || person.diabetes === "Yes") {
+        person.risk = "High"; high++;
       } else {
         low++;
       }
 
-      const tr = document.createElement("tr");
-      tr.innerHTML = `
-        <td>${name}</td>
-        <td>${age}</td>
-        <td>${gender}</td>
-        <td>${sys}/${dia}</td>
-        <td>${hr}</td>
-        <td>${diabetes}</td>
-        <td>${hyper}</td>
-        <td class="${risk.toLowerCase()}">${risk}</td>
-      `;
-      table.appendChild(tr);
+      seniors.push(person);
+
+      document.getElementById("personSelect").innerHTML +=
+        `<option value="${person.name}">${person.name}</option>`;
     });
 
-    new Chart(document.getElementById("riskChart"), {
-      type: "pie",
-      data: {
-        labels: ["Low Risk", "Medium Risk", "High Risk"],
-        datasets: [{
-          data: [low, medium, high]
-        }]
-      }
-    });
+    document.getElementById("total").innerText = seniors.length;
+    document.getElementById("low").innerText = low;
+    document.getElementById("high").innerText = high;
   });
+
+document.getElementById("personSelect").addEventListener("change", e => {
+  const p = seniors.find(s => s.name === e.target.value);
+  if (!p) return;
+
+  let advice = "Maintain healthy lifestyle";
+
+  if (p.risk === "High") {
+    advice = "Consult doctor, monitor BP & sugar regularly";
+  }
+
+  document.getElementById("profile").innerHTML = `
+    <h2>${p.name}</h2>
+    <p>Age: ${p.age}</p>
+    <p>Blood Pressure: ${p.bpSys}/${p.bpDia}</p>
+    <p>Heart Rate: ${p.hr}</p>
+    <p>Risk Level: <span class="${p.risk.toLowerCase()}">${p.risk}</span></p>
+    <p><b>Recommendation:</b> ${advice}</p>
+  `;
+});
